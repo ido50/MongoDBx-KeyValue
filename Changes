@@ -1,6 +1,7 @@
 Revision history for MongoDBx-KeyValue
 
 {{$NEXT}}
+	- Small documentation fixes and improvements
 
 0.001     2011-06-07 01:20:40 Asia/Jerusalem
 	- Initial release

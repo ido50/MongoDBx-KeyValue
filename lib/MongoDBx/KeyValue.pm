@@ -7,7 +7,7 @@ use warnings;
 use MongoDB;
 use Carp;
 
-our $VERSION = "0.001";
+our $VERSION = "0.001001";
 $VERSION = eval $VERSION;
 
 =head1 NAME
@@ -28,22 +28,28 @@ MongoDBx::KeyValue - Use MongoDB as if it were a key-value store.
 
 =head1 DESCRIPTION
 
-MongoDBx::KeyValue is a very simple module for easy using of MongoDB as
+MongoDBx::KeyValue is a very simple module for easy usage of L<MongoDB> as
 a key-value store (similar to Redis, Riak or Memcached).
 
-The interface is very simple. You can get the value of a key from a certain
-bucket by using the C<get()> method. A bucket is really just a MongoDB
-collection. This terminology is used just for resemblance to the Riak
-terminology. Setting the value for a key is similarly easy, by providing
-the C<set()> method with the name of the bucket, the key, and its value.
-If the key already exists in the bucket, its value will be replaced.
+The interface is very simple: you I<set> the values of keys and I<get> the
+values of keys. Every key-value pair is stored in a bucket, which is really
+just a MongoDB collection (the "bucket" terminology is used merely for
+resemblance with other key-value stores), so the same key can exist, with
+possibly different values, in multiple buckets.
+
+To get the value of a key, just pass the C<get()> method the name of the
+bucket and the key. If it is not found, C<undef> is returned. To set the
+value for a key, just provide the C<set()> method with the name of the
+bucket, the key and the value. If the key already exists in the bucket,
+its value will be replaced.
 
 The value for a key can be anything that MongoDB supports, including simple
-scalars (strings, numbers, etc.), hash or array references, or whatever
-else MongoDB supports such as L<DateTime> objects. While no checking is
-made for keys, you probably should only use scalars for the key. For every
-key-value document stored in the database, the key is saved as the "_id"
-attribute, while the value is saved in the "value" attribute.
+scalars (strings, numbers, etc.), hash or array references, and whatever
+else MongoDB natively supports such as L<DateTime> objects. While no checking is
+made for keys, you probably should only use scalars for them.
+
+Every key-value pair is stored in the database as a document with two
+attributes: "_id", which holds the key; and "value", which holds the value.
 
 =head1 CLASS METHODS
 
@@ -52,7 +58,7 @@ attribute, while the value is saved in the "value" attribute.
 Creates a new instance of this module and connects to the MongoDB server.
 The only required option is 'kvdb', which should hold the name of the
 database to use for the key-value store. All other options will be passed
-to C<MongoDB::Connection->new>, so take a look at L<MongoDB::Connection/"ATTRIBUTES">
+to C<< MongoDB::Connection->new() >>, so take a look at L<MongoDB::Connection/"ATTRIBUTES">
 for a list of all supported options.
 
 =cut
@@ -85,10 +91,11 @@ sub get {
 =head2 set( $bucket, $key, $value )
 
 Sets the value for the key named C<$key> inside the bucket named C<$bucket>.
-If the key already exists, its valu will be replaced with the new one.
+If the key already exists, its value will be replaced with the new one.
 
 It's probably better for keys to be scalars, but values can be anything,
-including hash-refs, array-refs and whatever MongoDB can store natively.
+including hash-refs, array-refs and whatever L<MongoDB> can store natively
+(take a look at L<MongoDB::DataTypes> for more info).
 
 =cut
 
@@ -128,8 +135,9 @@ This module generates the following errors:
 
 =over
 
-=item * "You must provide the name of the key-value database to use (as parameter 'kvdb')." - This
-error will be issued by the new() method if you don't provide it with
+=item * "You must provide the name of the key-value database to use (as parameter 'kvdb')."
+
+This error will be issued by the C<new()> method if you don't provide it with
 the 'kvdb' parameter, which should hold the name of the database to use
 as the key-value store.
 
